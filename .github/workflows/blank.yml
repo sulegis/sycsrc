@@ -49,6 +49,8 @@ jobs:
       
       # 4. 提交并强制推送到 B 仓库
       - name: Commit and force push
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -58,6 +60,6 @@ jobs:
           else
             git commit -m "chore: sync from A repo [skip ci]"
             git push --force \
-            "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+            "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
             "HEAD:${GITHUB_REF_NAME}"
           fi          
