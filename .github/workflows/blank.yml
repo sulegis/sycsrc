@@ -44,7 +44,7 @@ jobs:
             --exclude=dist/ \
             --exclude=examples/ \
             --exclude=node_modules/ \
-            --exclude=.github/ 
+            --exclude=.github/ \
             /tmp/repo-a/ ./ 
       
       # 4. 提交并强制推送到 B 仓库
