@@ -43,6 +43,7 @@ jobs:
           rsync -av --delete \
             --exclude=dist/ \
             --exclude=examples/ \
+            --exclude=examples-test/ \
             --exclude=node_modules/ \
             --exclude=.github/ \
             --exclude=.git \
