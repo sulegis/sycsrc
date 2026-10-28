@@ -20,7 +20,7 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     permissions:
-    contents: write   # 需要写权限推送回 B 仓库
+      contents: write   # 需要写权限推送回 B 仓库
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
