@@ -57,5 +57,7 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "chore: sync from A repo [skip ci]"
-            git push origin HEAD:${{ github.ref_name }} --force
+            git push --force \
+            "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+            "HEAD:${GITHUB_REF_NAME}"
           fi          
