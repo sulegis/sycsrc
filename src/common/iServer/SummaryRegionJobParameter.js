@@ -1,0 +1,214 @@
+/* Copyright© 2000 - 2026 SuperMap Software Co.Ltd. All rights reserved.
+ * This program are made available under the terms of the Apache License, Version 2.0
+ * which accompanies this distribution and is available at http://www.apache.org/licenses/LICENSE-2.0.html.*/
+import { Util } from '../commontypes/Util';
+import { SummaryType, AnalystSizeUnit } from '../REST';
+import { OutputSetting } from './OutputSetting';
+import { MappingParameters } from './MappingParameters';
+
+/**
+ * @class SummaryRegionJobParameter
+ * @deprecatedclass SuperMap.SummaryRegionJobParameter
+ * @category  iServer ProcessingService SummaryRegion
+ * @classdesc 区域汇总分析任务参数类。此类用于设置区域汇总分析的数据集、分析范围、标准属性字段、
+ * 权重字段、统计方式、汇总类型、网格类型和大小等参数，还可以对分析结果的输出参数、可视化参数进行一系列设置。
+ * @param {Object} options - 参数。
+ * @param {string} options.datasetName - 数据集名称，只支持线数据集和面数据集。
+ * @param {string} [options.regionDataset] - 汇总数据集，在多边形汇总时需指定的参数，只支持面数据集。
+ * @param {ModuleBounds} [options.query] - 区域汇总分析范围，默认为全图范围。
+ * @param {string} [options.standardFields] - 标准属性字段名称。
+ * @param {string} [options.weightedFields] - 权重字段名称。
+ * @param {StatisticAnalystMode} [options.standardStatisticModes] - 标准属性字段的统计模式。standardSummaryFields 为 true 时必填。
+ * @param {StatisticAnalystMode} [options.weightedStatisticModes] - 权重字段的统计模式。weightedSummaryFields 为 true 时必填。
+ * @param {boolean} [options.sumShape=true] - 如果源数据集是线数据集，则同时统计线的长度作为统计结果的一部分；如果源数据集是面数据集，则同时统计面的面积作为统计结果的一部分。
+ * @param {boolean} [options.standardSummaryFields=false] - 是否以标准属性字段统计。即对通过网格单元内的线或面对象的原有属性字段信息进行统计。
+ * @param {boolean} [options.weightedSummaryFields=false] - 是否以权重字段统计。即对通过网格单元内的线或面对象与网格单元相交部分的对象属性信息进行统计，相交部分的属性信息由标准属性字段的值加权计算得出。
+ * @param {number} [options.resolution=100] - 指定网格大小，当 type 为网格面汇总时必选，对于四边形网格为网格的边长；对于六边形网格为六边形顶点到中心点的距离。
+ * @param {number} [options.meshType=0] - 指定网格面汇总类型，当 type 为网格面汇总时必选，0 表示四边形网格，1 表示六边形网格。
+ * @param {AnalystSizeUnit} [options.meshSizeUnit=AnalystSizeUnit.METER] - 网格大小单位。
+ * @param {SummaryType} [options.type=SummaryType.SUMMARYMESH] - 区域汇总分析的类型，包括 SUMMARYMESH 网格面汇总，SUMMARYREGION 多边形汇总。
+ * @param {OutputSetting} [options.output] - 输出参数设置。
+ * @param {MappingParameters} [options.mappingParameters] - 分析后结果可视化的参数类。
+ * @usage
+ */
+export class SummaryRegionJobParameter {
+
+    constructor(options) {
+        if (!options) {
+            return;
+        }
+
+        /**
+         * @member {string} SummaryRegionJobParameter.prototype.datasetName
+         * @description 数据集名称。
+         */
+        this.datasetName = "";
+
+        /**
+         * @member {string} SummaryRegionJobParameter.prototype.regionDataset
+         * @description 汇总数据集，在多边形汇总时需指定的参数，只支持面数据集。
+         */
+        this.regionDataset = "";
+
+        /**
+         * @member {boolean} [SummaryRegionJobParameter.prototype.sumShape=true]
+         * @description 是否统计被汇总对象的面积或者长度。
+         */
+        this.sumShape = true;
+
+        /**
+         * @member {ModuleBounds} SummaryRegionJobParameter.prototype.query
+         * @description 分析范围。
+         */
+        this.query = "";
+
+        /**
+         * @member {boolean} [SummaryRegionJobParameter.prototype.standardSummaryFields=false]
+         * @description 是否以标准属性字段统计。即对通过网格单元内的线或面对象的原有属性字段信息进行统计。
+         */
+        this.standardSummaryFields = false;
+
+        /**
+         * @member {string} SummaryRegionJobParameter.prototype.standardFields
+         * @description 标准属性字段名称。仅支持系统字段以外的整形、长整形、浮点型的字段的名称。standardSummaryFields 为 true 时必填。
+         */
+        this.standardFields = "";
+
+        /**
+         * @member {StatisticAnalystMode} SummaryRegionJobParameter.prototype.standardStatisticModes
+         * @description 标准属性字段的统计模式。standardSummaryFields 为 true 时必填。
+         */
+        this.standardStatisticModes = "";
+
+        /**
+         * @member {boolean} [SummaryRegionJobParameter.prototype.weightedSummaryFields=false]
+         * @description 是否以权重字段统计。即对通过网格单元内的线或面对象与网格单元相交部分的对象属性信息进行统计，相交部分的属性信息由标准属性字段的值加权计算得出。
+         */
+        this.weightedSummaryFields = false;
+
+        /**
+         * @member {string} SummaryRegionJobParameter.prototype.weightedFields
+         * @description 权重字段名称。仅支持系统字段以外的整形、长整形、浮点型的字段的名称。weightedSummaryFields 为 true 时必填。
+         */
+        this.weightedFields = "";
+
+        /**
+         * @member {StatisticAnalystMode} SummaryRegionJobParameter.prototype.weightedStatisticModes
+         * @description 以权重字段统计的统计模式。权重字段的统计模式。weightedSummaryFields 为 true 时必填。
+         */
+        this.weightedStatisticModes = "";
+
+        /**
+         * @member {number} [SummaryRegionJobParameter.prototype.meshType=0]
+         * @description 指定网格面汇总类型，当 type 为网格面汇总时必选，0 表示四边形网格，1 表示六边形网格。
+         */
+        this.meshType = 0;
+
+        /**
+         * @member {number} [SummaryRegionJobParameter.prototype.resolution=100]
+         * @description 指定网格大小，当 type 为网格面汇总时必选，对于四边形网格为网格的边长；对于六边形网格为六边形顶点到中心点的距离。
+         */
+        this.resolution = 100;
+
+        /**
+         * @member {AnalystSizeUnit} [SummaryRegionJobParameter.prototype.meshSizeUnit=AnalystSizeUnit.METER]
+         * @description 网格大小单位。
+         */
+        this.meshSizeUnit = AnalystSizeUnit.METER;
+
+        /**
+         * @member {SummaryType} [SummaryRegionJobParameter.prototype.type=SummaryType.SUMMARYMESH]
+         * @description 区域汇总分析的类型，包括 SUMMARYMESH 网格面汇总，SUMMARYREGION 多边形汇总。
+         */
+        this.type = SummaryType.SUMMARYMESH;
+
+        /**
+         * @member {OutputSetting} SummaryRegionJobParameter.prototype.output
+         * @description 输出参数设置类。
+         */
+        this.output = null;
+
+        /**
+         * @member {MappingParameters} [SummaryRegionJobParameter.prototype.mappingParameters]
+         * @description 分析后结果可视化的参数类。
+         */
+        this.mappingParameters = null;
+
+        Util.extend(this, options);
+
+        this.CLASS_NAME = "SuperMap.SummaryRegionJobParameter";
+    }
+
+    /**
+     * @function SummaryRegionJobParameter.prototype.destroy
+     * @description 释放资源，将引用资源的属性置空。
+     */
+    destroy() {
+        this.datasetName = null;
+        this.sumShape = null;
+        this.regionDataset = null;
+        this.query = null;
+        this.standardSummaryFields = null;
+        this.standardFields = null;
+        this.standardStatisticModes = null;
+        this.weightedSummaryFields = null;
+        this.weightedFields = null;
+        this.weightedStatisticModes = null;
+        this.meshType = null;
+        this.resolution = null;
+        this.meshSizeUnit = null;
+        this.type = null;
+        if (this.output instanceof OutputSetting) {
+            this.output.destroy();
+            this.output = null;
+        }
+        if (this.mappingParameters instanceof MappingParameters){
+            this.mappingParameters.destroy();
+            this.mappingParameters = null;
+        }
+    }
+
+    /**
+     * @function SummaryRegionJobParameter.toObject
+     * @param {Object} summaryRegionJobParameter - 区域汇总分析任务参数。
+     * @param {Object} tempObj - 目标对象。
+     * @description 生成区域汇总分析服务对象。
+     */
+    static toObject(summaryRegionJobParameter, tempObj) {
+        for (var name in summaryRegionJobParameter) {
+            if (name === "datasetName") {
+                tempObj['input'] = tempObj['input'] || {};
+                tempObj['input'][name] = summaryRegionJobParameter[name];
+                continue;
+            }
+            if (name === "type") {
+                tempObj['type'] = summaryRegionJobParameter[name];
+                continue;
+            }
+            if (name === "type") {
+                tempObj['type'] = summaryRegionJobParameter[name];
+                continue;
+            }
+            if (name === "output") {
+                tempObj['output'] = tempObj['output'] || {};
+                tempObj['output'] = summaryRegionJobParameter[name];
+                continue;
+            }
+            if (summaryRegionJobParameter.type === "SUMMARYREGION" || summaryRegionJobParameter.type === "SUMMARYMESH" && name !== "regionDataset") {
+                tempObj['analyst'] = tempObj['analyst'] || {};
+                if (name === 'query' && summaryRegionJobParameter[name]) {
+                    tempObj['analyst'][name] = summaryRegionJobParameter[name].toBBOX();
+                } else {
+                    tempObj['analyst'][name] = summaryRegionJobParameter[name];
+                }
+                if(name === 'mappingParameters'){
+                    tempObj['analyst'][name] = tempObj['analyst'][name] || {};
+                    tempObj['analyst']['mappingParameters'] = summaryRegionJobParameter[name];
+                }
+
+            }
+        }
+    }
+
+}
+

@@ -1,0 +1,30 @@
+{
+  "name": "@supermapgis/iclient-ol",
+  "description": "",
+  "version": "12.2.0",
+  "keywords": [
+    "SuperMap",
+    "OpenLayers"
+  ],
+  "main": "namespace.js",
+  "homepage": "https://iclient.supermap.io",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SuperMap/iClient-JavaScript.git"
+  },
+  "author": "SuperMap",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@supermapgis/iclient-common": "12.2.0",
+    "@supermapgis/tile-decryptor": "^1.0.0",
+    "@turf/turf": "7.2.0",
+    "mapv": "2.0.62",
+    "ol": "10.5.0",
+    "canvg": "^4.0.3",
+    "lodash.clonedeep": "^4.5.0",
+    "lodash.remove": "^4.7.0",
+    "lodash.difference": "^4.5.0",
+    "flatgeobuf": "3.31.1",
+    "proj4": "2.17.0"
+  }
+}

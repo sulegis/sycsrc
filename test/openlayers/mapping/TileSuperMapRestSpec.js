@@ -1,0 +1,337 @@
+import { TileSuperMapRest } from '../../../src/openlayers/mapping/TileSuperMapRest';
+import {NDVIParameter} from '../../../src/common/iServer/NDVIParameter';
+import {HillshadeParameter} from '../../../src/common/iServer/HillshadeParameter';
+import {ChartSettingS57} from '../../../src/common/iServer/ChartSettingS57';
+import {getQueryValue} from '../../tool/utils';
+
+import Point from 'ol/geom/Point';
+import * as olProj from 'ol/proj';
+import TileGrid from 'ol/tilegrid/TileGrid';
+
+var url = GlobeParameter.imageURL;
+describe('openlayers_TileSuperMapRest', () => {
+    var originalTimeout;
+    beforeEach(() => {
+        originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = 50000;
+    });
+    afterEach(() => {
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+    });
+
+    it('initialize', () => {
+        var tileOptions = {
+            url: url,
+            prjCoordSys: {
+                epsgCode: 4326
+            }
+        };
+        var tileSource = new TileSuperMapRest(tileOptions);
+        expect(tileSource.options).not.toBeNull();
+    });
+
+    it('tileUrlFunction_url_{a-f}', () => {
+        var tempOptions = {
+            url: 'http://localhost:9876/iserver{a-f}/services/map-world/rest/maps/世界地图_Day',
+            extent: [0, 0, 90, 90],
+            prjCoordSys: {
+                epsgCode: 4326
+            }
+        };
+        var tileSourcetile = new TileSuperMapRest(tempOptions);
+        var pixelRatio = '245';
+        var coords = [5,3,2];
+        var tileUrl = tileSourcetile.tileUrlFunction(coords, pixelRatio, olProj.get('EPSG:4326'));
+        expect(tileUrl).not.toBeNull();
+        expect(tileUrl).toContain('iserverc');
+    });
+    it('tileUrlFunction_url_{0-8}', () => {
+        var tempOptions = {
+            url: 'http://localhost:9876/iserver{0-8}/services/map-world/rest/maps/世界地图_Day',
+            extent: [0, 0, 90, 90],
+            prjCoordSys: {
+                epsgCode: 4326
+            }
+        };
+        var tileSourcetile = new TileSuperMapRest(tempOptions);
+        var pixelRatio = '245';
+        var coords = [5,4,2];
+        var tileUrl = tileSourcetile.tileUrlFunction(coords, pixelRatio, olProj.get('EPSG:4326'));
+        expect(tileUrl).not.toBeNull();
+        expect(tileUrl).toContain('iserver4');
+        var coords = [6,4,2];
+        var tileUrl = tileSourcetile.tileUrlFunction(coords, pixelRatio, olProj.get('EPSG:4326'));
+        expect(tileUrl).not.toBeNull();
+        expect(tileUrl).toContain('iserver6');
+    });
+    it('tileUrlFunction_urls', () => {
+        var tempOptions = {
+            urls: ['http://localhost:9876/iserver/services/map-world1','http://localhost:9876/iserver/services/map-world2'],
+            extent: [0, 0, 90, 90],
+            prjCoordSys: {
+                epsgCode: 4326
+            }
+        };
+        var tileSourcetile = new TileSuperMapRest(tempOptions);
+        var pixelRatio = '245';
+        var coords = [5,4,2];
+        var tileUrl = tileSourcetile.tileUrlFunction(coords, pixelRatio, olProj.get('EPSG:4326'));
+        expect(tileUrl).not.toBeNull();
+        expect(tileUrl).toContain('map-world1');
+    });
+    it('tileUrlFunction', () => {
+        var tempOptions = {
+            url: url,
+            extent: [0, 0, 90, 90],
+            prjCoordSys: {
+                epsgCode: 4326
+            }
+        };
+        var tileSourcetile = new TileSuperMapRest(tempOptions);
+        var pixelRatio = '245';
+        var coords = new Point(120.14, 30.24);
+        var tileUrl = tileSourcetile.tileUrlFunction(coords, pixelRatio, olProj.get('EPSG:4326'));
+        expect(tileUrl).not.toBeNull();
+        expect(tileSourcetile.getTileGrid().getTileSize()).toEqual(256);
+        expect(tileSourcetile.getTileGrid().getResolution(0)).toEqual(90.0 / 256);
+    });
+
+    it('tileUrlFunction_displayFilters', () => {
+        const displayFilters = {
+            'World@World': "NAME = 'A&B+C' AND SMID > 1",
+            'Capitals@World': 'POPULATION >= 1000000'
+        };
+        const tileSource = new TileSuperMapRest({
+            url: url,
+            prjCoordSys: { epsgCode: 4326 },
+            displayFilters: displayFilters
+        });
+        const tileUrl = tileSource.tileUrlFunction([0, 0, 0], 1, olProj.get('EPSG:4326'));
+        expect(tileSource.requestParams.displayFilters).toBe(JSON.stringify(displayFilters));
+        expect(getQueryValue(tileUrl, 'displayFilters')).toBe(encodeURIComponent(JSON.stringify(displayFilters)));
+        expect(JSON.parse(decodeURIComponent(getQueryValue(tileUrl, 'displayFilters')))).toEqual(displayFilters);
+        expect(getQueryValue(tileUrl, 'x')).toBe('0');
+        expect(getQueryValue(tileUrl, 'width')).toBe('256');
+    });
+
+    it('tileUrlFunction_withoutDisplayFilters', () => {
+        const tileSource = new TileSuperMapRest({
+            url: url,
+            prjCoordSys: { epsgCode: 4326 }
+        });
+        const tileUrl = tileSource.tileUrlFunction([0, 0, 0], 1, olProj.get('EPSG:4326'));
+        expect(tileSource.requestParams.displayFilters).toBeUndefined();
+        expect(getQueryValue(tileUrl, 'displayFilters')).toBeNull();
+    });
+
+    it('tileUrlFunction_displayFilters_tileProxy', () => {
+        const displayFilters = { 'World@World': "NAME = 'A&B+C'" };
+        const tileProxy = 'https://example.com/proxy?url=';
+        const tileSource = new TileSuperMapRest({
+            url: url,
+            prjCoordSys: { epsgCode: 4326 },
+            displayFilters: displayFilters,
+            tileProxy: tileProxy
+        });
+        const tileUrl = tileSource.tileUrlFunction([0, 0, 0], 1, olProj.get('EPSG:4326'));
+        expect(tileUrl.startsWith(tileProxy)).toBeTrue();
+        const requestUrl = decodeURIComponent(tileUrl.substring(tileProxy.length));
+        expect(requestUrl.startsWith(url + '/tileImage.png?')).toBeTrue();
+        expect(JSON.parse(decodeURIComponent(getQueryValue(requestUrl, 'displayFilters')))).toEqual(displayFilters);
+        expect(tileSource.requestParams.displayFilters).toBe(JSON.stringify(displayFilters));
+    });
+
+    it('tileUrlFunction_displayFilters_urls', () => {
+        const displayFilters = { 'World@World': 'SMID > 1' };
+        const urls = [url + '/map-world1', url + '/map-world2'];
+        const tileSource = new TileSuperMapRest({
+            urls: urls,
+            prjCoordSys: { epsgCode: 4326 },
+            displayFilters: displayFilters
+        });
+        const tileUrl = tileSource.tileUrlFunction([5, 4, 2], 1, olProj.get('EPSG:4326'));
+        expect(tileUrl.startsWith(urls[0] + '/tileImage.png?')).toBeTrue();
+        expect(tileSource.requestParams.displayFilters).toBe(JSON.stringify(displayFilters));
+        expect(JSON.parse(decodeURIComponent(getQueryValue(tileUrl, 'displayFilters')))).toEqual(displayFilters);
+    });
+
+    it('updateParams_displayFilters', () => {
+        const displayFilters = { 'World@World': 'SMID > 1' };
+        const tileSource = new TileSuperMapRest({
+            url: url,
+            prjCoordSys: { epsgCode: 4326 },
+            displayFilters: displayFilters
+        });
+        const projection = olProj.get('EPSG:4326');
+        const tileUrl = tileSource.tileUrlFunction([0, 0, 0], 1, projection);
+        expect(JSON.parse(decodeURIComponent(getQueryValue(tileUrl, 'displayFilters')))).toEqual(displayFilters);
+
+        const newDisplayFilters = { 'World@World': 'SMID > 10', 'Capitals@World': 'POPULATION > 1000000' };
+        tileSource.updateParams({ displayFilters: newDisplayFilters });
+        const updatedTileUrl = tileSource.tileUrlFunction([0, 0, 0], 1, projection);
+        expect(tileSource.options.displayFilters).toEqual(newDisplayFilters);
+        expect(JSON.parse(decodeURIComponent(getQueryValue(updatedTileUrl, 'displayFilters')))).toEqual(newDisplayFilters);
+        expect(updatedTileUrl).not.toBe(tileUrl);
+        expect(tileSource.tileUrlFunction([0, 0, 0], 1, projection)).toBe(updatedTileUrl);
+    });
+
+    it('tileGrid_overflowTiles_internalGrid', () => {
+        var tileSource = new TileSuperMapRest({
+            url: url,
+            extent: [-180, -90, 180, 90],
+            overflowTiles: 1,
+            prjCoordSys: {
+                epsgCode: 4326
+            }
+        });
+        tileSource.tileUrlFunction([0, 0, 0], 1, olProj.get('EPSG:4326'));
+        const tileRange = tileSource.getTileGrid().getTileRangeForExtentAndZ([-180, -90, 180, 90], 0);
+        const fullTileRange = tileSource.getTileGrid().getFullTileRange(0);
+        expect(tileRange.minX).toBe(-1);
+        expect(tileRange.maxX).toBe(1);
+        expect(tileRange.minY).toBe(-1);
+        expect(tileRange.maxY).toBe(1);
+        expect(fullTileRange.minX).toBe(-1);
+        expect(fullTileRange.maxX).toBe(1);
+        expect(fullTileRange.minY).toBe(-1);
+        expect(fullTileRange.maxY).toBe(1);
+    });
+
+    it('tileGrid_overflowTiles_customTileGrid', () => {
+        var tileGrid = new TileGrid({
+            extent: [-180, -90, 180, 90],
+            origin: [-180, 90],
+            resolutions: [180 / 256],
+            tileSize: 256
+        });
+        var tileSource = new TileSuperMapRest({
+            url: url,
+            tileGrid: tileGrid,
+            overflowTiles: 1,
+            prjCoordSys: {
+                epsgCode: 4326
+            }
+        });
+        const tileRange = tileSource.getTileGrid().getTileRangeForExtentAndZ([-180, -90, 180, 90], 0);
+        expect(tileRange.minX).toBe(-1);
+        expect(tileRange.maxX).toBe(2);
+        expect(tileRange.minY).toBe(-1);
+        expect(tileRange.maxY).toBe(1);
+    });
+
+    it('tileUrlFunction_overflowTiles_negativeTileCoord', () => {
+        var tileSource = new TileSuperMapRest({
+            url: url,
+            extent: [-180, -90, 180, 90],
+            overflowTiles: 1,
+            prjCoordSys: {
+                epsgCode: 4326
+            }
+        });
+        var tileUrl = tileSource.tileUrlFunction([0, -1, -1], 1, olProj.get('EPSG:4326'));
+        expect(tileUrl).toContain('&x=-1');
+        expect(tileUrl).toContain('&y=-1');
+    });
+
+    it('tileUrlFunction_tilePoxy', () => {
+        var tileOptions = {
+            url: url,
+            prjCoordSys: {
+                epsgCode: 4326
+            },
+            tileProxy: 'tileProxy'
+        };
+        var tileSourcetilePoxy = new TileSuperMapRest(tileOptions);
+        var pixelRatio = '245';
+        var coords = new Point(120.14, 30.24);
+        var tileUrl = tileSourcetilePoxy.tileUrlFunction(coords, pixelRatio, olProj.get('EPSG:4326'));
+        expect(tileUrl).not.toBeNull();
+    });
+    it('tileUrlFunction_rasterfunction_ndviParameter', () => {
+        var tileOptions = {
+            url: url,
+            prjCoordSys: {
+                epsgCode: 4326
+            },
+            rasterfunction: new NDVIParameter({ redIndex: 0, nirIndex: 2 })
+        };
+        var tileSourcetilePoxy = new TileSuperMapRest(tileOptions);
+        var pixelRatio = '245';
+        var coords = new Point(120.14, 30.24);
+        var tileUrl = tileSourcetilePoxy.tileUrlFunction(coords, pixelRatio, olProj.get('EPSG:4326'));
+        expect(tileUrl).not.toBeNull();
+        const ndviParameterValue = getQueryValue(tileUrl, 'rasterfunction');
+        expect(ndviParameterValue).not.toBeNull;
+        const ndviParameter = JSON.parse(decodeURIComponent(ndviParameterValue));
+        expect(ndviParameter.type).toBe('NDVI');
+        expect(ndviParameter.redIndex).toBe(0);
+        expect(ndviParameter.nirIndex).toBe(2);
+        expect(ndviParameter.colorMap).toBe(
+            '0:ffffe5ff;0.1:f7fcb9ff;0.2:d9f0a3ff;0.3:addd8eff;0.4:78c679ff;0.5:41ab5dff;0.6:238443ff;0.7:006837ff;1:004529ff'
+        );
+    });
+    it('tileUrlFunction_rasterfunction_hillshadeParameter', () => {
+        var tileOptions = {
+            url: url,
+            prjCoordSys: {
+                epsgCode: 4326
+            },
+            rasterfunction:new HillshadeParameter({altitude:10,azimuth:200})
+        };
+        var tileSourcetilePoxy = new TileSuperMapRest(tileOptions);
+        var pixelRatio = '245';
+        var coords = new Point(120.14, 30.24);
+        var tileUrl = tileSourcetilePoxy.tileUrlFunction(coords, pixelRatio, olProj.get('EPSG:4326'));
+        expect(tileUrl).not.toBeNull();
+        const hillshadeParameterValue = getQueryValue(tileUrl,'rasterfunction');
+        expect(hillshadeParameterValue).not.toBeNull;
+        const hillshadeParameter = JSON.parse(decodeURIComponent(hillshadeParameterValue));
+        expect(hillshadeParameter.type).toBe("HILLSHADE");
+        expect(hillshadeParameter.altitude).toBe(10);
+        expect(hillshadeParameter.azimuth).toBe(200);
+        expect(hillshadeParameter.zFactor).toBe(1);
+    });
+    it('tileUrlFunction_chartSetting', () => {
+      var tileOptions = {
+          url: url,
+          prjCoordSys: {
+              epsgCode: 4326
+          },
+          chartSetting: new ChartSettingS57({
+            colourModeChart: ol.supermap.ColourModeChart.DUSK
+          })
+      };
+      var tileSource = new TileSuperMapRest(tileOptions);
+      var pixelRatio = '245';
+      var coords = new Point(120.14, 30.24);
+      var tileUrl = tileSource.tileUrlFunction(coords, pixelRatio, olProj.get('EPSG:4326'));
+      expect(tileUrl).not.toBeNull();
+      const chartSetting = getQueryValue(tileUrl,'chartSetting');
+      expect(chartSetting).not.toBeNull;
+      const chartSettingParameter = JSON.parse(decodeURIComponent(chartSetting));
+      expect(chartSettingParameter.colourModeChart).toBe('DUSK');
+  });
+    it('updateParams', () => {
+      var tileOptions = {
+          url: url,
+          prjCoordSys: {
+              epsgCode: 4326
+          },
+          chartSetting: new ChartSettingS57({
+            colourModeChart: ol.supermap.ColourModeChart.DUSK
+          })
+      };
+      var tileSource = new TileSuperMapRest(tileOptions);
+      var pixelRatio = '245';
+      var coords = new Point(120.14, 30.24);
+      var tileUrl = tileSource.tileUrlFunction(coords, pixelRatio, olProj.get('EPSG:4326'));
+      expect(tileUrl).not.toBeNull();
+      const chartSetting = getQueryValue(tileUrl,'chartSetting');
+      expect(chartSetting).not.toBeNull;
+      const newChartSetting = new ChartSettingS57({
+        colourModeChart: ol.supermap.ColourModeChart.NIGHT
+      });
+      tileSource.updateParams({chartSetting: newChartSetting})
+      expect(tileSource.requestParams.chartSetting.colourModeChart).toBe('NIGHT');
+  });
+});

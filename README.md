@@ -1,0 +1,29 @@
+# SuperMap iClient JavaScript
+
+[![npm version](https://img.shields.io/npm/v/@supermap/iclient-common.svg)](https://www.npmjs.com/org/supermapgis)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FSuperMap%2FiClient-JavaScript.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FSuperMap%2FiClient-JavaScript?ref=badge_shield)
+
+## 简介 | [ENGLISH](https://github.com/SuperMap/iClient-JavaScript/blob/master/README_EN.md)
+
+SuperMap iClient JavaScript 是一套开源开放的 WebGIS 客户端应用开发包，基于现代 Web 技术栈全新构建，是 SuperMap 云 GIS 和在线 GIS 平台系列产品的统一 JavaScript 客户端。它集成了领先的开源地图库、可视化库，支持多源数据与地图服务，支持多终端，跨浏览器。提供了全新的 GIS 大数据可视化、实时流数据可视化等功能，通过本产品可快速实现浏览器上美观、流畅的地图呈现。
+
+[![Overview](https://iclient.supermap.io/en/web/img/overview/product_overview.png)](https://iclient.supermap.io/web/introduction/overview.html)
+
+[中文官网](https://iclient.supermap.io) | [ENGLISH HOMEPAGE](https://iclient.supermap.io/en/web/index.html)
+
+## WebComponents Web组件库
+### [vue-iclient](https://github.com/SuperMap/vue-iclient)
+
+基于Vue 2.x的iClient UI组件库，[快速上手文档](https://iclient.supermap.io/web/apis/vue/zh/api/guide/quick-start.html)
+
+
+## Contributors
+
+<a href="https://github.com/SuperMap/iClient-JavaScript/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=SuperMap/iClient-JavaScript" />
+</a>
+
+## 许可
+[ Apache License 2.0 ](./LICENSE)
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FSuperMap%2FiClient-JavaScript.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FSuperMap%2FiClient-JavaScript?ref=badge_large)

@@ -1,0 +1,112 @@
+/* Copyright© 2000 - 2026 SuperMap Software Co.Ltd. All rights reserved.
+ * This program are made available under the terms of the Apache License, Version 2.0
+ * which accompanies this distribution and is available at http://www.apache.org/licenses/LICENSE-2.0.html.*/
+import { Util } from '../commontypes/Util';
+
+/**
+ * @class VideoFeature
+ * @category iServer Data
+ * @classdesc 视频要素类，用于表示视频流及其空间范围等相关属性的要素。
+ * @version 11.2.0
+ * @param {Object} options - 参数。
+ * @param {ModulePolygonAndBounds} options.geometry - 视频参数对应的视频视角空间范围，只支持矩形。
+ * @param {string|number} [options.id] - 要素ID。
+ * @param {string} [options.name] - 视频名称。
+ * @param {string} [options.address] - 视频流地址。目前支持m3u8格式视频流。
+ * @param {string} [options.attributes] - 要素属性信息。
+ * @usage
+ */
+export class VideoFeature {
+  constructor(options) {
+    /**
+     * @member {string|number} VideoFeature.prototype.id
+     * @description 要素 ID。
+     */
+    this.id = null;
+    /**
+     * @member {string} VideoFeature.prototype.name
+     * @description 视频名称
+     */
+    this.name = null;
+
+    /**
+     * @member {ModulePolygonAndBounds} VideoFeature.prototype.geometry
+     * @description 视频参数对应的视频视角空间范围，只支持矩形
+     *
+     */
+    this.geometry = null;
+
+    /**
+     * @member {string} VideoFeature.prototype.address
+     * @description 视频流地址
+     */
+    this.address = null;
+
+    /**
+     * @member {Object} VideoFeature.prototype.attributes
+     * @description 要素属性信息
+     */
+    this.attributes = {};
+    // ToDo
+    this.videoParameters = null;
+    // ToDo
+    this.cameraLocation = null;
+
+    Util.extend(this, options);
+    this.CLASS_NAME = 'SuperMap.VideoFeature';
+  }
+
+  /**
+   * @function VideoFeature.prototype.destroy
+   * @description 销毁此对象。
+   */
+  destroy() {
+    if (this.geometry && this.geometry.destroy) {
+      this.geometry.destroy();
+    }
+    this.geometry = null;
+    this.name = null;
+    this.videoParameters = null;
+    this.cameraLocation = null;
+    this.address = null;
+    this.attributes = null;
+  }
+  /**
+   * @function VideoFeature.prototype.toGeoJSONFeature
+   * @description 转换为GeoJSON Feature Object
+   * @return {Object}
+   */
+  toGeoJSONFeature(geometryFunction) {
+    return {
+      type: 'Feature',
+      geometry: geometryFunction ? geometryFunction(this.geometry) : this.geometry,
+      properties: this.attributes,
+      name: this.name,
+      address: this.address,
+      id: this.id
+    };
+  }
+  /**
+   * @function VideoFeature.prototype.toServerFeature
+   * @description 转换为iServer Feature Object
+   * @return {Object}
+   */
+  toServerFeature({ geometryFunction }) {
+    const feature = {
+      type: 'VideoFeature',
+      geometry: geometryFunction && this.geometry ? geometryFunction(this.geometry) : this.geometry,
+      name: this.name,
+      address: this.address,
+      id: this.id
+    };
+    const fieldNames = [];
+    const fieldValues = [];
+    for (const key in this.attributes) {
+      fieldNames.push(key);
+      fieldValues.push(this.attributes[key]);
+    }
+    feature.fieldNames = fieldNames;
+    feature.fieldValues = fieldValues;
+    return feature;
+  }
+}
